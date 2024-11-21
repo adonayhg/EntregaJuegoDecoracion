@@ -17,6 +17,8 @@ public class Mover : MonoBehaviour
     GameObject objetoGolpeado;
     [SerializeField]
     GameObject camara;
+    [SerializeField]
+    GameObject circulo;
 
     [SerializeField]
     float durationAnimation;
@@ -31,6 +33,7 @@ public class Mover : MonoBehaviour
 
     Vector3 posicionCerca = new Vector3(-2.96f, 1.19f, 0.05f);
     Vector3 posicionLejos = new Vector3(-3.6f, 1.47f, -1.09f);
+    Vector3 escaladoCirculo = new Vector3(0.5f, 0.003f, 0.5f);
 
     void Update()
     {
@@ -48,7 +51,8 @@ public class Mover : MonoBehaviour
             PopUpMover.SetActive(false);
 
             LeanTween.move(camara, posicionLejos, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
-
+            circulo.SetActive(false);
+            objetoSeleccionado = null;
         }
 
         if (PopUpMover.activeSelf)
@@ -61,9 +65,12 @@ public class Mover : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 objetoSeleccionado.transform.position = hit.point;
+                circulo.transform.position = hit.point;
+                circulo.transform.parent = objetoSeleccionado.transform;
             }
             objetoSeleccionado.SetActive(true);
         }
+
     }
 
     public void SeleccionarObjeto()
@@ -87,6 +94,8 @@ public class Mover : MonoBehaviour
 
             objetoSeleccionado = objetoGolpeado;
         }
+        circulo.SetActive(true);
+
     }
 
     public void DeseleccionarObjeto()
@@ -106,6 +115,13 @@ public class Mover : MonoBehaviour
         LeanTween.moveLocalY(PopUpMover, positionYAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
 
         LeanTween.move(camara, posicionCerca, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
+
+        circulo.transform.localScale = new Vector3(1.9f, 0.003f, 1.9f);
+
+        if (circulo.transform.localScale == new Vector3(1.9f, 0.003f, 1.9f))
+        {
+            LeanTween.scale(circulo, escaladoCirculo, 35 * Time.deltaTime).setLoopPingPong().setEase(LeanTweenType.easeInSine);
+        }
 
 
     }

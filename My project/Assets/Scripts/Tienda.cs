@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class Tienda : MonoBehaviour
@@ -16,6 +17,8 @@ public class Tienda : MonoBehaviour
     GameObject PopUpCrear;
     [SerializeField]
     GameObject camara;
+    [SerializeField]
+    GameObject circulo;
 
     [SerializeField]
     float durationAnimation;
@@ -33,12 +36,14 @@ public class Tienda : MonoBehaviour
 
     Vector3 posicionCerca = new Vector3(-2.96f, 1.19f, 0.05f);
     Vector3 posicionLejos = new Vector3(-3.6f, 1.47f, -1.09f);
+    Vector3 escaladoCirculo = new Vector3(0.5f, 0.003f, 0.5f);
 
     // Start is called before the first frame update
     void Start()
     {
         preFab.SetActive(false);
         PopUpCrear.SetActive(false);
+        circulo.SetActive(false);
     }
 
     // Update is called once per frame
@@ -47,6 +52,8 @@ public class Tienda : MonoBehaviour
     
             if (objetoMovimiento)
             {
+                circulo.SetActive(true);
+
                 objetoCreado.SetActive(false);
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
@@ -54,8 +61,12 @@ public class Tienda : MonoBehaviour
                 if (Physics.Raycast(ray, out hit))
                 {
                     objetoCreado.transform.position = hit.point;
+                    circulo.transform.position = hit.point;
+                    circulo.transform.parent = objetoCreado.transform;
                 }
-                objetoCreado.SetActive(true);
+
+            objetoCreado.SetActive(true);
+
 
 
                 if (Input.GetMouseButtonUp(1))
@@ -72,14 +83,22 @@ public class Tienda : MonoBehaviour
 
                     //Camera.main.transform.position = posicionLejos;
                     LeanTween.move(camara , posicionLejos, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
+                    circulo.SetActive(false);
+                    
+                    
+                }
             }
-            }
+                
     }
+
     public void CrearObjeto() 
     {
             objetoCreado = Instantiate(preFab, Vector3.zero, Quaternion.identity);
             objetoCreado.SetActive(true);
-            objetoMovimiento= true;
+            circulo.SetActive(false);
+
+
+            objetoMovimiento = true;
             //PopUpMenu.SetActive(false);
             LeanTween.moveLocalY(PopUpMenu, position2YAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
 
@@ -94,5 +113,12 @@ public class Tienda : MonoBehaviour
             //Camera.main.transform.position = posicionCerca;
             LeanTween.move(camara, posicionCerca, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
 
+            circulo.transform.localScale = new Vector3(1.9f, 0.003f, 1.9f);
+
+            if(circulo.transform.localScale == new Vector3(1.9f, 0.003f, 1.9f))
+            {
+            LeanTween.scale(circulo, escaladoCirculo, 35 * Time.deltaTime).setLoopPingPong().setEase(LeanTweenType.easeInSine);
+            }
     }
+
 }

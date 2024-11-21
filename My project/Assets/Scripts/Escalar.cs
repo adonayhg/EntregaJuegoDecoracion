@@ -1,24 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class Eliminar : MonoBehaviour
+public class Escalar : MonoBehaviour
 {
     [SerializeField]
     GameObject PopUpMenu;
     [SerializeField]
     GameObject PopUpTienda;
     [SerializeField]
-    GameObject PopUpEliminar;
+    GameObject PopUpEscalar;
     [SerializeField]
     GameObject objetoSeleccionado;
     [SerializeField]
     GameObject objetoGolpeado;
     [SerializeField]
     GameObject camara;
-    [SerializeField]
-    GameObject circulo;
 
     [SerializeField]
     float durationAnimation;
@@ -30,10 +27,24 @@ public class Eliminar : MonoBehaviour
     float positionXAnimation;
     [SerializeField]
     float position2XAnimation;
+    [SerializeField]
+    float desplazamientoRueda;
+    [SerializeField]
+    float velocidadRotacion;
 
     Vector3 posicionCerca = new Vector3(-2.96f, 1.19f, 0.05f);
     Vector3 posicionLejos = new Vector3(-3.6f, 1.47f, -1.09f);
+    Vector3 escalado = new Vector3(0.01f, 0.01f, 0.01f);
+    Vector3 maxEscala = new Vector3(1.2f, 1.2f, 1.2f);
+    Vector3 minEscala = new Vector3(0.8f, 0.8f, 0.8f);
 
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -41,28 +52,44 @@ public class Eliminar : MonoBehaviour
             SeleccionarObjeto();
         }
 
-        if (Input.GetKey(KeyCode.Backspace) & PopUpEliminar.activeSelf)
-        {
-            Destroy(objetoSeleccionado);
-            
+        desplazamientoRueda = Input.GetAxis("Mouse ScrollWheel");
 
+        if (desplazamientoRueda >= 0 && PopUpEscalar.activeSelf)
+        {
+            objetoSeleccionado.transform.localScale += escalado;
+
+            if(objetoSeleccionado.transform.localScale == maxEscala)
+            {
+                desplazamientoRueda = 0;
+            }
+        }
+
+       if (desplazamientoRueda <=0 && PopUpEscalar.activeSelf)
+        {
+            objetoSeleccionado.transform.localScale -= escalado;
+
+            if (objetoSeleccionado.transform.localScale == minEscala)
+            {
+                desplazamientoRueda = 0;
+            }
+        }
+
+        if (objetoSeleccionado.transform.localScale.y < 0.8f)
+        {
+            objetoSeleccionado.transform.localScale = minEscala;
+        }
+
+
+        if (Input.GetMouseButtonUp(1) & PopUpEscalar.activeSelf)
+        {
             //PopUpMenu.SetActive(true);
             LeanTween.moveLocalY(PopUpMenu, positionYAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
 
-            LeanTween.moveLocalY(PopUpEliminar, position2YAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
-            PopUpEliminar.SetActive(false);
+            LeanTween.moveLocalY(PopUpEscalar, position2YAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
+            PopUpEscalar.SetActive(false);
 
             LeanTween.move(camara, posicionLejos, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
-        }
 
-        if (Input.GetMouseButtonDown(1) & PopUpEliminar.activeSelf)
-        {
-            LeanTween.moveLocalY(PopUpMenu, positionYAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
-
-            LeanTween.moveLocalY(PopUpEliminar, position2YAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
-            PopUpEliminar.SetActive(false);
-
-            LeanTween.move(camara, posicionLejos, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
         }
     }
 
@@ -94,7 +121,8 @@ public class Eliminar : MonoBehaviour
         objetoSeleccionado = null;
     }
 
-    public void EliminarObjeto()
+
+    public void EscalarObjeto()
     {
         //PopUpMenu.SetActive(false);
         LeanTween.moveLocalY(PopUpMenu, position2YAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
@@ -102,8 +130,9 @@ public class Eliminar : MonoBehaviour
         //PopUpTienda.SetActive(false);
         LeanTween.moveLocalX(PopUpTienda, position2XAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
 
-        PopUpEliminar.SetActive(true);
-        LeanTween.moveLocalY(PopUpEliminar, positionYAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
+        PopUpEscalar.SetActive(true);
+        LeanTween.moveLocalY(PopUpEscalar, positionYAnimation, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
+
 
         LeanTween.move(camara, posicionCerca, durationAnimation * Time.deltaTime).setEase(LeanTweenType.easeInSine);
     }
